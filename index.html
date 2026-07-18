@@ -59,7 +59,7 @@
   </header>
 
   <!-- ══════════════════ THE APPROACH ══════════════════
-       A pinned, scroll-driven dolly toward the obsidian keep.
+       A self-playing cinematic dolly toward the obsidian keep.
        World: black / gray / white, moonlit blue. The only color
        is the fire waiting behind the gate. -->
   <div class="approach" id="approach" aria-label="Approach to the keep">
@@ -160,13 +160,13 @@
       <!-- Pass-through flash -->
       <div class="flash" id="flash" aria-hidden="true"></div>
 
-      <!-- Scroll hint -->
-      <div class="hint" id="hint" aria-hidden="true">
-        <span class="hint__line"></span>
-        <span class="hint__word">scroll to approach</span>
-      </div>
+      <!-- Skip -->
+      <button class="skip" id="skipIntro" aria-label="Skip the intro">skip <span>→</span></button>
     </div>
   </div>
+
+  <!-- Cinematic cut between the gate and the hall -->
+  <div class="blackout" id="blackout" aria-hidden="true"></div>
 
   <!-- ══════════════════ THE INTERIOR ══════════════════
        Past the gate. Obsidian noir, lit by fire. -->
@@ -375,6 +375,11 @@
       <p class="footer__whisper">Black, gray, white — and one flame behind the gate.</p>
     </footer>
   </main>
+
+  <button class="replay-btn" id="replayBtn" aria-label="Replay the approach">
+    <span class="replay-btn__glyph">⟲</span>
+    <span class="replay-btn__label">intro</span>
+  </button>
 
   <button class="sound-toggle" id="soundToggle" aria-label="Toggle winter wind" aria-pressed="false">
     <span class="sound-toggle__wave"></span>

@@ -1,11 +1,12 @@
 /* =========================================================
    FROSTFALL — Scene engine
-   A scroll-driven dolly toward the obsidian keep.
-   - Exponential zoom on layered castle silhouettes
-   - Floating text that lurks in depth and flies past camera
-   - Fire in the gate that grows into the pass-through flash
-   - One particle canvas: stars + snow outside, embers inside,
-     crossfaded by how far through the gate you are.
+   A self-playing cinematic approach to the obsidian keep.
+   - Timed exponential dolly on layered castle silhouettes
+   - Floating text that materializes and dissolves in place
+   - Fire in the gate → full flash → hard cut to black →
+     slow cinematic reveal of the hall
+   - Skip during the intro; replay any time from inside.
+   - One particle canvas: stars + snow outside, embers inside.
    ========================================================= */
 (function () {
   'use strict';
@@ -15,82 +16,118 @@
   const approach = document.getElementById('approach');
   const stage = document.getElementById('stage');
   const flash = document.getElementById('flash');
-  const hint = document.getElementById('hint');
+  const blackout = document.getElementById('blackout');
   const bgWarm = document.getElementById('bgWarm');
   const bgCold = document.getElementById('bgCold');
   const canvas = document.getElementById('particles');
+  const skipBtn = document.getElementById('skipIntro');
+  const replayBtn = document.getElementById('replayBtn');
   if (!stage || !canvas) return;
+
+  const DUR = 16000;            // full approach, ms
+  const SKIP_FROM = 0.88;       // skip fast-forwards to here (plays the flash)
 
   const ctx = canvas.getContext('2d');
   const layers = Array.from(stage.querySelectorAll('.layer'))
     .map((el) => ({ el, k: parseFloat(el.dataset.k) || 2 }));
   const ftexts = Array.from(stage.querySelectorAll('.ftext')).map((el) => {
-    const p0 = parseFloat(el.dataset.p);
     el.style.setProperty('--x', el.dataset.x + '%');
     el.style.setProperty('--y', el.dataset.y + '%');
-    return {
-      el, p0,
-      x: parseFloat(el.dataset.x),
-      y: parseFloat(el.dataset.y),
-      side: parseFloat(el.dataset.x) < 50 ? -1 : 1,
-    };
+    return { el, p0: parseFloat(el.dataset.p) };
   });
 
   let W = 0, H = 0, DPR = 1;
-  let targetP = 0, p = 0;       // approach progress 0..1
+  let mode = 'idle';            // 'intro' | 'idle'
+  let t0 = 0;
+  let p = 0;                    // approach progress 0..1
   let inside = 0;               // 0 outside → 1 inside
+
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const smooth = (a, b, v) => { const t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 
-  /* ---------- scroll → progress ---------- */
-  function readScroll() {
-    const rect = approach.getBoundingClientRect();
-    const span = approach.offsetHeight - window.innerHeight;
-    targetP = span > 0 ? clamp(-rect.top / span, 0, 1) : 1;
-  }
-  window.addEventListener('scroll', readScroll, { passive: true });
-
   /* ---------- apply camera state ---------- */
   function apply() {
-    // dolly: exponential scale per layer, origin at the gate
     for (const l of layers) {
       l.el.style.transform = 'scale(' + Math.pow(l.k, p).toFixed(4) + ')';
     }
 
-    // fire + windows brighten on approach
     stage.style.setProperty('--fireop', (0.3 + 0.7 * p * p).toFixed(3));
     stage.style.setProperty('--winop', (p * p).toFixed(3));
 
-    // floating texts: local window around p0 — grow, pass, blur out
+    // floating texts: materialize, hold, dissolve — all in place
     for (const t of ftexts) {
-      const q = (p - (t.p0 - 0.085)) / 0.175;
+      const q = (p - (t.p0 - 0.08)) / 0.17;
       if (q <= 0 || q >= 1) { t.el.style.opacity = 0; continue; }
-      const s = 0.72 * Math.pow(6.5, q);                    // fly toward camera
-      const dx = (t.x - 50) * q * q * 1.7;                  // drift outward from gate
-      const dy = (t.y - 55) * q * q * 1.1;
-      const op = Math.pow(Math.sin(Math.PI * q), 0.9) * (s > 3.4 ? clamp(1 - (s - 3.4) / 1.6, 0, 1) : 1);
-      const blur = clamp((s - 2.4) * 1.4, 0, 5);
-      const rot = t.side * (1 - q) * 14;
+      let op, blur, scale, dy;
+      if (q < 0.3) {                    // materialize
+        const u = q / 0.3;
+        op = u; blur = (1 - u) * 3; scale = 0.96 + 0.04 * u; dy = 0;
+      } else if (q < 0.68) {            // hold
+        op = 1; blur = 0; scale = 1 + (q - 0.3) * 0.02; dy = 0;
+      } else {                          // dissolve
+        const u = (q - 0.68) / 0.32;
+        op = 1 - u; blur = u * 4; scale = 1.008 + u * 0.06; dy = -u * 1.6;
+      }
       t.el.style.opacity = op.toFixed(3);
       t.el.style.filter = blur > 0.1 ? 'blur(' + blur.toFixed(2) + 'px)' : 'none';
       t.el.style.transform =
-        'translate(-50%, -50%) translate(' + dx.toFixed(1) + 'vw,' + dy.toFixed(1) + 'vh)' +
-        ' perspective(900px) rotateY(' + rot.toFixed(1) + 'deg) scale(' + s.toFixed(3) + ')';
+        'translate(-50%, -50%) translateY(' + dy.toFixed(2) + 'vh) scale(' + scale.toFixed(3) + ')';
     }
 
-    // pass-through flash + fade the stage away
-    flash.style.opacity = smooth(0.8, 0.94, p).toFixed(3);
-    stage.style.opacity = (1 - smooth(0.955, 1, p)).toFixed(3);
+    flash.style.opacity = smooth(0.84, 0.95, p).toFixed(3);
 
-    // world state
-    inside = smooth(0.86, 0.985, p);
+    inside = smooth(0.8, 0.95, p);
     bgWarm.style.opacity = inside.toFixed(3);
     bgCold.style.opacity = (1 - inside).toFixed(3);
-    document.body.classList.toggle('is-inside', p > 0.93);
 
-    // hint fades as soon as the journey starts
-    if (hint) hint.style.opacity = p < 0.02 ? 1 : 0;
+    if (skipBtn) skipBtn.style.opacity = p > 0.8 ? 0 : 1;
   }
+
+  /* ---------- intro control ---------- */
+  function playIntro() {
+    window.scrollTo(0, 0);
+    document.body.classList.add('is-intro');
+    document.body.classList.remove('is-inside', 'is-entering');
+    approach.classList.remove('is-done');
+    blackout.classList.remove('is-cut');
+    blackout.style.opacity = 0;
+    stage.style.opacity = 1;
+    mode = 'intro';
+    t0 = performance.now();
+  }
+
+  function endIntro() {
+    mode = 'idle';
+    p = 1; inside = 1;
+    apply();
+
+    // hard cut to black over the flash…
+    blackout.classList.add('is-cut');          // opacity 1, no transition
+    approach.classList.add('is-done');
+    document.body.classList.remove('is-intro');
+    document.body.classList.add('is-inside', 'is-entering');
+    bgWarm.style.opacity = 1; bgCold.style.opacity = 0;
+
+    // …then the hall wakes slowly out of it
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        blackout.classList.remove('is-cut');   // transition back on
+        blackout.style.opacity = 0;
+      });
+    });
+    setTimeout(() => document.body.classList.remove('is-entering'), 3200);
+  }
+
+  if (skipBtn) skipBtn.addEventListener('click', () => {
+    if (mode !== 'intro') return;
+    const raw = (performance.now() - t0) / DUR;
+    if (raw < SKIP_FROM) t0 = performance.now() - SKIP_FROM * DUR;
+  });
+
+  if (replayBtn) replayBtn.addEventListener('click', () => {
+    if (mode === 'intro') return;
+    playIntro();
+  });
 
   /* =========================================================
      PARTICLES — stars & snow (cold) / embers (warm)
@@ -141,7 +178,7 @@
       vx: (Math.random() - 0.5) * 0.3,
       a: 0.25 + Math.random() * 0.6,
       ph: Math.random() * Math.PI * 2,
-      hue: 18 + Math.random() * 26,       // ember orange → gold
+      hue: 18 + Math.random() * 26,
       life: 0.6 + Math.random() * 0.4,
     };
   }
@@ -150,19 +187,16 @@
     ctx.clearRect(0, 0, W, H);
     const cold = 1 - inside, warm = inside;
 
-    // wind
     if (t > gustT) { windTarget = (Math.random() - 0.35) * 0.8; gustT = t + 3000 + Math.random() * 5000; }
     wind += (windTarget - wind) * 0.01;
 
     if (cold > 0.02) {
-      // stars
       for (const s of stars) {
         s.tw += s.ts * dt;
         ctx.globalAlpha = cold * (0.35 + 0.4 * Math.sin(s.tw)) * 0.9;
         ctx.fillStyle = '#e8eef3';
         ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
       }
-      // snow — white with the faintest ice-blue cast
       for (const f of flakes) {
         f.ph += f.sp * dt;
         f.x += (wind * f.d * 1.3 + Math.sin(f.ph) * 0.35) * dt;
@@ -180,7 +214,6 @@
     }
 
     if (warm > 0.02) {
-      // embers — rise, flicker, die
       for (let i = 0; i < embers.length; i++) {
         const e = embers[i];
         e.ph += 0.04 * dt;
@@ -206,30 +239,30 @@
     const dt = Math.min(48, t - last) / 16.67;
     last = t;
 
-    p += (targetP - p) * Math.min(1, 0.14 * dt);   // eased camera
-    if (Math.abs(targetP - p) < 0.0004) p = targetP;
-    apply();
+    if (mode === 'intro') {
+      const raw = clamp((t - t0) / DUR, 0, 1);
+      p = Math.pow(raw, 1.25);      // slow start, accelerating toward the gate
+      apply();
+      if (raw >= 1) endIntro();
+    }
+
     drawParticles(dt, t);
     requestAnimationFrame(frame);
   }
 
-  /* ---------- reduced motion: skip the dolly ---------- */
-  function staticBoot() {
-    resize();
-    targetP = 1; p = 1;
-    apply();
-    document.body.classList.add('is-inside');
-    drawParticles(1, 0);
-  }
-
-  window.addEventListener('resize', () => { resize(); readScroll(); });
-
+  /* ---------- boot ---------- */
+  window.addEventListener('resize', resize);
   resize();
-  readScroll();
+
   if (reduceMotion) {
-    staticBoot();
+    // no cutscene: land inside, draw one calm frame
+    p = 1; inside = 1;
+    approach.classList.add('is-done');
+    document.body.classList.add('is-inside');
+    bgWarm.style.opacity = 1; bgCold.style.opacity = 0;
+    drawParticles(1, 0);
   } else {
-    p = targetP;   // land where we are on reload mid-page
+    playIntro();
     requestAnimationFrame(frame);
   }
 })();

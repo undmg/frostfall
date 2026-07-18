@@ -180,13 +180,24 @@ body.is-inside .scroll-progress span {
 @keyframes blink { 0%,100%{opacity:.2} 50%{opacity:1} }
 
 /* =========================================================
-   THE APPROACH — pinned dolly toward the keep
+   THE APPROACH — a self-playing dolly toward the keep
    ========================================================= */
-.approach { position: relative; height: 560vh; z-index: 20; pointer-events: none; }
-.approach__stage {
-  position: sticky; top: 0; height: 100vh; overflow: hidden;
-  pointer-events: none;
+.approach {
+  /* above the interior (10), below the particle canvas (40) so snow falls over the castle */
+  position: fixed; inset: 0; z-index: 30; pointer-events: none;
+  transition: visibility 0s linear 0s;
 }
+.approach.is-done { visibility: hidden; }
+.approach__stage { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+body.is-intro { overflow: hidden; }
+
+/* the cut: flash → black → hall */
+.blackout {
+  position: fixed; inset: 0; z-index: 600; background: #000;
+  opacity: 0; pointer-events: none;
+  transition: opacity 2.2s var(--ease);
+}
+.blackout.is-cut { transition: none; opacity: 1; }
 
 .sky {
   position: absolute; inset: 0;
@@ -270,17 +281,19 @@ body.is-inside .scroll-progress span {
   will-change: opacity;
 }
 
-/* scroll hint */
-.hint {
-  position: absolute; left: 50%; bottom: 8vh; transform: translateX(-50%);
-  display: grid; justify-items: center; gap: .7rem; z-index: 25;
-  font-family: var(--serif); font-size: .62rem; letter-spacing: .38em;
+/* skip button — the only interactive thing during the intro */
+.skip {
+  position: absolute; right: clamp(1rem, 3vw, 2.4rem); bottom: 8.5vh; z-index: 30;
+  pointer-events: auto; cursor: none;
+  background: rgba(3, 4, 5, 0.4); border: 1px solid var(--line); border-radius: 40px;
+  padding: .6rem 1.2rem;
+  font-family: var(--serif); font-size: .64rem; letter-spacing: .34em;
   text-transform: uppercase; color: var(--smoke);
-  transition: opacity .6s;
+  transition: color .3s, border-color .3s, opacity .6s;
 }
-.hint__line { width: 1px; height: 44px; background: linear-gradient(var(--silver), transparent); position: relative; overflow: hidden; }
-.hint__line::after { content:''; position:absolute; top:-50%; left:0; width:1px; height:50%; background: var(--white); animation: fall-line 2.2s var(--ease) infinite; }
-@keyframes fall-line { to { top: 100%; } }
+.skip span { display: inline-block; transition: transform .3s var(--ease); }
+.skip:hover { color: var(--white); border-color: rgba(242, 244, 246, .4); }
+.skip:hover span { transform: translateX(4px); }
 
 /* =========================================================
    NAVIGATION — sealed until you are inside
@@ -336,11 +349,20 @@ body.is-inside .nav { opacity: 1; pointer-events: auto; transform: none; }
    ========================================================= */
 .interior {
   position: relative; z-index: 10;
-  margin-top: -100vh;   /* rise beneath the fading stage: flash crossfades straight into the hall */
   /* stone: faint chiseled banding over the warm dark */
   background:
     repeating-linear-gradient(180deg, transparent 0 118px, rgba(185, 191, 197, 0.016) 118px 120px),
     repeating-linear-gradient(90deg, transparent 0 218px, rgba(185, 191, 197, 0.012) 218px 220px);
+}
+
+/* cinematic entrance: the hall wakes slowly out of the black */
+body.is-entering .interior {
+  animation: interior-enter 2.8s var(--ease) both;
+}
+@keyframes interior-enter {
+  0%   { transform: scale(1.05); filter: brightness(0.35) saturate(0.7); }
+  60%  { filter: brightness(0.8) saturate(0.9); }
+  100% { transform: scale(1); filter: brightness(1) saturate(1); }
 }
 
 .section { position: relative; padding: clamp(5rem, 12vh, 9rem) var(--pad); max-width: var(--maxw); margin: 0 auto; }
@@ -516,6 +538,22 @@ body.is-inside .nav { opacity: 1; pointer-events: auto; transform: none; }
 .footer p { font-size: .82rem; letter-spacing: .08em; }
 .footer__whisper { font-style: italic; color: rgba(107, 114, 120, 0.6); margin-top: .5rem; font-size: .76rem; }
 
+/* ---------- Replay intro ---------- */
+.replay-btn {
+  position: fixed; left: clamp(1rem, 3vw, 2rem); bottom: clamp(1rem, 3vw, 2rem); z-index: 120;
+  display: inline-flex; align-items: center; gap: .5rem; height: 46px; padding: 0 1.1rem;
+  border: 1px solid var(--line); border-radius: 40px; background: rgba(5, 6, 8, .6); backdrop-filter: blur(10px);
+  cursor: none; color: var(--smoke);
+  opacity: 0; pointer-events: none; transform: translateY(10px);
+  transition: opacity .8s var(--ease), transform .8s var(--ease), border-color .3s, box-shadow .3s, color .3s;
+}
+body.is-inside .replay-btn { opacity: 1; pointer-events: auto; transform: none; }
+body.is-intro .replay-btn { opacity: 0 !important; pointer-events: none !important; }
+.replay-btn:hover { color: var(--gold); border-color: rgba(245, 199, 110, .4); box-shadow: var(--glow-gold); }
+.replay-btn__glyph { font-size: 1rem; line-height: 1; transition: transform .5s var(--ease); }
+.replay-btn:hover .replay-btn__glyph { transform: rotate(-320deg); }
+.replay-btn__label { font-family: var(--serif); font-size: .62rem; letter-spacing: .24em; text-transform: uppercase; }
+
 /* ---------- Sound toggle ---------- */
 .sound-toggle {
   position: fixed; right: clamp(1rem, 3vw, 2rem); bottom: clamp(1rem, 3vw, 2rem); z-index: 120;
@@ -558,15 +596,13 @@ body.is-inside .sound-toggle.is-on .sound-toggle__wave { background: var(--flame
   .relic-grid { grid-template-columns: 1fr; }
   .relic--wide { grid-column: span 1; }
   .ravenry__form { grid-template-columns: 1fr; }
-  .approach { height: 480vh; }
   .cine { height: 4vh; }
 }
 
-/* ---------- Reduced motion: skip the dolly ---------- */
+/* ---------- Reduced motion: skip the cutscene ---------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
   .reveal { opacity: 1; transform: none; }
-  .approach { height: 100vh; }
-  .ftext { opacity: 1 !important; transform: translate(-50%, -50%) !important; filter: none !important; }
+  .approach, .blackout { display: none; }
   .grain { display: none; }
 }
