@@ -1,7 +1,7 @@
 /* =========================================================
-   FROSTFALL — Interactions
+   FROSTFALL — Interior interactions
    Preloader, custom cursor, scroll reveals, nav state,
-   animated counters, tilt-aura, form, and ambient wind.
+   animated counters, relic auras, form, and ambient wind.
    ========================================================= */
 (function () {
   'use strict';
@@ -14,8 +14,8 @@
   window.addEventListener('load', () => {
     const pl = $('#preloader');
     if (!pl) return;
-    setTimeout(() => pl.classList.add('is-done'), reduceMotion ? 200 : 1200);
-    setTimeout(() => pl.remove(), 2200);
+    setTimeout(() => pl.classList.add('is-done'), reduceMotion ? 200 : 1100);
+    setTimeout(() => pl.remove(), 2100);
   });
 
   /* ---------- Year ---------- */
@@ -48,12 +48,10 @@
 
   /* ---------- Scroll progress ---------- */
   const bar = $('#scrollBar');
-  const nav = $('#nav');
   function onScroll() {
     const st = window.scrollY || document.documentElement.scrollTop;
     const h = document.documentElement.scrollHeight - innerHeight;
     if (bar) bar.style.width = (h > 0 ? (st / h) * 100 : 0) + '%';
-    if (nav) nav.classList.toggle('is-stuck', st > 40);
   }
   addEventListener('scroll', onScroll, { passive: true });
   onScroll();
@@ -91,10 +89,10 @@
         if (reduceMotion) { el.textContent = target + suffix; return; }
         const dur = 1600; const start = performance.now();
         (function tick(now) {
-          const p = Math.min(1, (now - start) / dur);
-          const eased = 1 - Math.pow(1 - p, 3);
+          const pr = Math.min(1, (now - start) / dur);
+          const eased = 1 - Math.pow(1 - pr, 3);
           el.textContent = Math.round(target * eased) + suffix;
-          if (p < 1) requestAnimationFrame(tick);
+          if (pr < 1) requestAnimationFrame(tick);
         })(start);
       });
     }, { threshold: 0.6 });
@@ -102,7 +100,7 @@
   }
 
   /* ---------- Active nav link ---------- */
-  const sections = ['home', 'chronicle', 'arts', 'relics', 'raven']
+  const sections = ['hall', 'forge', 'vault', 'ravenry']
     .map((id) => document.getElementById(id)).filter(Boolean);
   const linkFor = {};
   $$('.nav__links a').forEach((a) => { linkFor[a.getAttribute('href').slice(1)] = a; });
@@ -115,7 +113,7 @@
           if (l) l.classList.add('is-active');
         }
       });
-    }, { threshold: 0.5, rootMargin: '-30% 0px -50% 0px' });
+    }, { threshold: 0.4, rootMargin: '-25% 0px -45% 0px' });
     sections.forEach((s) => sio.observe(s));
   }
 
@@ -147,7 +145,7 @@
     });
   }
 
-  /* ---------- Raven form ---------- */
+  /* ---------- Ravenry form ---------- */
   const form = $('#ravenForm');
   const status = $('#ravenStatus');
   if (form) {
@@ -162,10 +160,10 @@
         status.style.color = 'var(--ember)';
         return;
       }
-      status.style.color = 'var(--arcane)';
+      status.style.color = 'var(--gold)';
       status.textContent = 'Releasing the raven…';
       setTimeout(() => {
-        status.textContent = `It takes wing, ${name.split(' ')[0]}. Watch the northern sky for a reply.`;
+        status.textContent = `It takes wing, ${name.split(' ')[0]}. Watch the smoke above the towers for a reply.`;
         form.reset();
       }, 1100);
     });
@@ -176,7 +174,6 @@
   let audioCtx = null, windNode = null, gain = null, lfo = null, on = false;
   function buildWind() {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    // pink-ish noise buffer
     const len = audioCtx.sampleRate * 2;
     const buf = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
     const data = buf.getChannelData(0);
@@ -194,7 +191,6 @@
     const filter = audioCtx.createBiquadFilter();
     filter.type = 'bandpass'; filter.frequency.value = 480; filter.Q.value = 0.6;
 
-    // slow gust modulation
     lfo = audioCtx.createOscillator(); lfo.frequency.value = 0.08;
     const lfoGain = audioCtx.createGain(); lfoGain.gain.value = 320;
     lfo.connect(lfoGain); lfoGain.connect(filter.frequency);
@@ -216,7 +212,7 @@
     });
   }
 
-  /* ---------- Konami-ish easter egg: press "b" for a blizzard ---------- */
+  /* ---------- Easter egg: press "b" for a blizzard flash ---------- */
   addEventListener('keydown', (e) => {
     if (e.key.toLowerCase() === 'b' && !/input|textarea/i.test(document.activeElement.tagName)) {
       document.body.animate(

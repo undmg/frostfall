@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="The frozen archive of a wandering craftsman — a dark fantasy portfolio wrapped in snow and old magic." />
-  <meta name="theme-color" content="#05070f" />
-  <title>Frostfall — Archive of the Wanderer</title>
+  <meta name="description" content="Frostfall — an obsidian keep at the world's cold edge. Scroll to approach the gate. A dark portfolio in black, gray, white — and fire." />
+  <meta name="theme-color" content="#030405" />
+  <title>Frostfall — The Obsidian Keep</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=EB+Garamond:ital@0;1&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" />
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%E2%9D%84%EF%B8%8F%3C/text%3E%3C/svg%3E" />
   <link rel="stylesheet" href="css/style.css" />
@@ -17,98 +17,178 @@
 <body>
   <!-- Preloader -->
   <div class="preloader" id="preloader" aria-hidden="true">
-    <div class="preloader__rune" aria-hidden="true">
-      <svg viewBox="0 0 100 100" width="90" height="90">
-        <circle cx="50" cy="50" r="44" class="pl-ring" />
-        <circle cx="50" cy="50" r="34" class="pl-ring pl-ring--slow" />
-        <path d="M50 12 L50 88 M22 30 L78 70 M78 30 L22 70" class="pl-glyph" />
+    <div class="preloader__mark">
+      <svg viewBox="0 0 100 100" width="84" height="84">
+        <path d="M50 8 L58 34 L84 34 L63 50 L71 78 L50 60 L29 78 L37 50 L16 34 L42 34 Z" class="pl-star" />
       </svg>
     </div>
-    <p class="preloader__text">Unsealing the archive<span class="dots"><i>.</i><i>.</i><i>.</i></span></p>
+    <p class="preloader__text">Approaching the black keep<span class="dots"><i>.</i><i>.</i><i>.</i></span></p>
   </div>
 
-  <!-- Atmosphere layers -->
-  <canvas id="aurora" class="fx-layer" aria-hidden="true"></canvas>
-  <div class="mountains" aria-hidden="true">
-    <div class="mountains__far"></div>
-    <div class="mountains__mid"></div>
-    <div class="mountains__near"></div>
-  </div>
-  <div class="fog fog--back" aria-hidden="true"></div>
-  <canvas id="snow" class="fx-layer fx-layer--top" aria-hidden="true"></canvas>
-  <div class="fog fog--front" aria-hidden="true"></div>
+  <!-- Fixed atmosphere -->
+  <div class="bg bg--cold" id="bgCold" aria-hidden="true"></div>
+  <div class="bg bg--warm" id="bgWarm" aria-hidden="true"></div>
+  <canvas id="particles" class="particles" aria-hidden="true"></canvas>
   <div class="vignette" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="cine cine--top" id="cineTop" aria-hidden="true"></div>
+  <div class="cine cine--bot" id="cineBot" aria-hidden="true"></div>
   <div class="cursor" id="cursor" aria-hidden="true"><span></span></div>
 
-  <!-- Progress rune -->
+  <!-- Scroll progress -->
   <div class="scroll-progress" aria-hidden="true"><span id="scrollBar"></span></div>
 
-  <!-- Navigation -->
+  <!-- Navigation (revealed once inside) -->
   <header class="nav" id="nav">
-    <a class="nav__crest" href="#home" aria-label="Return to the gate">
-      <svg viewBox="0 0 48 48" width="34" height="34" aria-hidden="true">
+    <a class="nav__crest" href="#hall" aria-label="The Great Hall">
+      <svg viewBox="0 0 48 48" width="30" height="30" aria-hidden="true">
         <path d="M24 3 L43 13 V27 C43 37 34 43 24 46 C14 43 5 37 5 27 V13 Z" class="crest-shield" />
         <path d="M24 12 L24 34 M16 20 L32 20 M18 27 L30 27" class="crest-glyph" />
       </svg>
       <span>Frostfall</span>
     </a>
     <nav class="nav__links" aria-label="Primary">
-      <a href="#chronicle" data-num="I">Chronicle</a>
-      <a href="#arts" data-num="II">Arcane Arts</a>
-      <a href="#relics" data-num="III">Relics</a>
-      <a href="#raven" data-num="IV">Send a Raven</a>
+      <a href="#hall" data-num="I">The Hall</a>
+      <a href="#forge" data-num="II">The Forge</a>
+      <a href="#vault" data-num="III">The Vault</a>
+      <a href="#ravenry" data-num="IV">The Ravenry</a>
     </nav>
     <button class="nav__toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
   </header>
 
-  <main>
-    <!-- HERO -->
-    <section class="hero" id="home">
-      <div class="hero__inner">
-        <p class="hero__eyebrow reveal" data-reveal>❄ The frozen archive of a wandering craftsman ❄</p>
-        <h1 class="hero__title">
-          <span class="line reveal" data-reveal data-delay="1">Where Winter</span>
-          <span class="line reveal glow" data-reveal data-delay="2">Keeps Its Secrets</span>
-        </h1>
-        <p class="hero__lede reveal" data-reveal data-delay="3">
-          I forge interfaces from cold light and old magic — worlds that feel carved
-          from ice yet warm to the touch. Wander in. The snow never stops here.
-        </p>
-        <div class="hero__actions reveal" data-reveal data-delay="4">
-          <a class="btn btn--primary" href="#relics"><span>Enter the Vault</span></a>
-          <a class="btn btn--ghost" href="#raven"><span>Summon Me</span></a>
-        </div>
-        <dl class="hero__stats reveal" data-reveal data-delay="5">
-          <div><dt data-count="8">0</dt><dd>Winters Crafting</dd></div>
-          <div><dt data-count="60" data-suffix="+">0</dt><dd>Relics Forged</dd></div>
-          <div><dt data-count="14">0</dt><dd>Realms Served</dd></div>
-        </dl>
-      </div>
-      <a class="hero__scroll" href="#chronicle" aria-label="Descend">
-        <span class="hero__scroll-line"></span>
-        <span class="hero__scroll-word">descend</span>
-      </a>
-    </section>
+  <!-- ══════════════════ THE APPROACH ══════════════════
+       A pinned, scroll-driven dolly toward the obsidian keep.
+       World: black / gray / white, moonlit blue. The only color
+       is the fire waiting behind the gate. -->
+  <div class="approach" id="approach" aria-label="Approach to the keep">
+    <div class="approach__stage" id="stage">
 
-    <!-- CHRONICLE / ABOUT -->
-    <section class="section chronicle" id="chronicle">
+      <!-- sky -->
+      <div class="sky" aria-hidden="true"></div>
+
+      <!-- FAR: ridge + moon -->
+      <div class="layer layer--far" data-k="1.7" aria-hidden="true">
+        <div class="moon"></div>
+        <svg class="castle-svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
+          <path fill="#10151c" d="M0 900 L0 704 L110 628 L228 694 L342 606 L470 690 L600 622 L714 668 L800 640 L900 672 L1020 600 L1150 678 L1290 612 L1420 682 L1520 640 L1600 676 L1600 900 Z"/>
+        </svg>
+      </div>
+
+      <!-- MID: rear towers & curtain wall -->
+      <div class="layer layer--mid" data-k="3.4" aria-hidden="true">
+        <svg class="castle-svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
+          <g fill="#0a0e13">
+            <!-- left rear tower -->
+            <path d="M285 900 V430 L300 430 L300 408 L316 408 L316 430 L332 430 L332 408 L348 408 L348 430 L364 430 L364 408 L380 408 L380 430 L395 430 V900 Z"/>
+            <path d="M283 430 L340 356 L397 430 Z"/>
+            <!-- right rear tower -->
+            <path d="M1205 900 V430 L1220 430 L1220 408 L1236 408 L1236 430 L1252 430 L1252 408 L1268 408 L1268 430 L1284 430 L1284 408 L1300 408 L1300 430 L1315 430 V900 Z"/>
+            <path d="M1203 430 L1260 356 L1317 430 Z"/>
+            <!-- curtain wall -->
+            <path d="M0 900 V600 L60 600 L60 580 L92 580 L92 600 L124 600 L124 580 L156 580 L156 600 L188 600 L188 580 L220 580 L220 600 L285 600 V900 Z"/>
+            <path d="M395 900 V600 L440 600 L440 580 L472 580 L472 600 L504 600 L504 580 L536 580 L536 600 L568 600 L568 580 L600 580 L600 600 L640 600 V900 Z"/>
+            <path d="M960 900 V600 L1000 600 L1000 580 L1032 580 L1032 600 L1064 600 L1064 580 L1096 580 L1096 600 L1128 600 L1128 580 L1160 580 L1160 600 L1205 600 V900 Z"/>
+            <path d="M1315 900 V600 L1380 600 L1380 580 L1412 580 L1412 600 L1444 600 L1444 580 L1476 580 L1476 600 L1508 600 L1508 580 L1540 580 L1540 600 L1600 600 V900 Z"/>
+          </g>
+          <!-- faint lit slits on rear towers -->
+          <g class="win" fill="#d98a45">
+            <rect x="334" y="480" width="7" height="26"/>
+            <rect x="334" y="560" width="7" height="26"/>
+            <rect x="1254" y="480" width="7" height="26"/>
+            <rect x="1254" y="560" width="7" height="26"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- KEEP: gatehouse with the arch cut out; fire behind it -->
+      <div class="layer layer--keep" data-k="15" aria-hidden="true">
+        <div class="gate-fire" id="gateFire"></div>
+        <svg class="castle-svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
+          <!-- facade with pointed-arch gate cut out -->
+          <path fill="#05070a" fill-rule="evenodd" d="
+            M520 900 V352 L536 352 L536 326 L556 326 L556 352 L576 352 L576 326 L596 326 L596 352 L616 352 L616 326 L636 326 L636 352 L656 352 V470
+            L700 470 L700 452 L722 452 L722 470 L744 470 L744 452 L766 452 L766 470 L788 470 L788 452 L812 452 L812 470 L834 470 L834 452 L856 452 L856 470 L878 470 L878 452 L900 452 L900 470 L944 470
+            V352 L964 352 L964 326 L984 326 L984 352 L1004 352 L1004 326 L1024 326 L1024 352 L1044 352 L1044 326 L1064 326 L1064 352 L1080 352 V900 Z
+            M800 560 C 760 596 744 636 744 668 L744 900 L856 900 L856 668 C 856 636 840 596 800 560 Z"/>
+          <!-- flank tower caps -->
+          <path fill="#05070a" d="M516 326 L588 252 L660 326 Z"/>
+          <path fill="#05070a" d="M940 326 L1012 252 L1084 326 Z"/>
+          <!-- portcullis bars across the arch -->
+          <g stroke="#05070a" stroke-width="7">
+            <line x1="762" y1="600" x2="762" y2="900"/>
+            <line x1="787" y1="576" x2="787" y2="900"/>
+            <line x1="813" y1="576" x2="813" y2="900"/>
+            <line x1="838" y1="600" x2="838" y2="900"/>
+            <line x1="744" y1="668" x2="856" y2="668"/>
+            <line x1="744" y1="762" x2="856" y2="762"/>
+          </g>
+          <!-- window slits, faintly lit -->
+          <g class="win" fill="#d98a45">
+            <rect x="566" y="410" width="8" height="34"/>
+            <rect x="606" y="410" width="8" height="34"/>
+            <rect x="1000" y="410" width="8" height="34"/>
+            <rect x="1040" y="410" width="8" height="34"/>
+            <rect x="584" y="520" width="8" height="30"/>
+            <rect x="1022" y="520" width="8" height="30"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- NEAR: framing bastions, exit view fastest -->
+      <div class="layer layer--near" data-k="30" aria-hidden="true">
+        <svg class="castle-svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
+          <g fill="#020304">
+            <path d="M0 900 V640 L90 560 L210 656 L290 610 L290 900 Z"/>
+            <path d="M1600 900 V640 L1510 560 L1390 656 L1310 610 L1310 900 Z"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Floating text — lurks around the castle, flies past the camera -->
+      <div class="ftexts" aria-hidden="false">
+        <p class="ftext ftext--title" data-p="0.055" data-x="50" data-y="26">FROSTFALL</p>
+        <p class="ftext" data-p="0.16" data-x="26" data-y="40">A keep of black glass<br>at the world's cold edge.</p>
+        <p class="ftext" data-p="0.30" data-x="73" data-y="34">I build interfaces<br>cold as stone —</p>
+        <p class="ftext" data-p="0.44" data-x="27" data-y="52">precise as a blade,<br>patient as winter.</p>
+        <p class="ftext" data-p="0.58" data-x="72" data-y="48">But past the gate,<br>the forges never sleep.</p>
+        <p class="ftext ftext--small" data-p="0.72" data-x="50" data-y="44">come closer</p>
+        <p class="ftext ftext--enter" data-p="0.84" data-x="50" data-y="58">ENTER</p>
+      </div>
+
+      <!-- Pass-through flash -->
+      <div class="flash" id="flash" aria-hidden="true"></div>
+
+      <!-- Scroll hint -->
+      <div class="hint" id="hint" aria-hidden="true">
+        <span class="hint__line"></span>
+        <span class="hint__word">scroll to approach</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ THE INTERIOR ══════════════════
+       Past the gate. Obsidian noir, lit by fire. -->
+  <main class="interior" id="interior">
+
+    <!-- I · THE GREAT HALL -->
+    <section class="section hall" id="hall">
       <div class="section__head">
         <span class="section__num">I</span>
-        <h2 class="section__title reveal" data-reveal>The Chronicle</h2>
-        <p class="section__sub reveal" data-reveal data-delay="1">Who wanders here</p>
+        <h2 class="section__title reveal" data-reveal>The Great Hall</h2>
+        <p class="section__sub reveal" data-reveal data-delay="1">You are inside. The fires are lit.</p>
       </div>
-      <div class="chronicle__grid">
-        <div class="chronicle__portrait reveal" data-reveal>
+      <div class="hall__grid">
+        <div class="hall__portrait reveal" data-reveal>
           <div class="portrait-frame">
             <div class="portrait-frame__glow"></div>
             <svg viewBox="0 0 200 260" class="portrait-sigil" aria-hidden="true">
               <defs>
                 <radialGradient id="pg" cx="50%" cy="35%" r="70%">
-                  <stop offset="0%" stop-color="#bfe9ff" stop-opacity="0.9"/>
-                  <stop offset="55%" stop-color="#4b74a8" stop-opacity="0.35"/>
-                  <stop offset="100%" stop-color="#0a1120" stop-opacity="0"/>
+                  <stop offset="0%" stop-color="#f5c76e" stop-opacity="0.55"/>
+                  <stop offset="55%" stop-color="#7a3b1e" stop-opacity="0.25"/>
+                  <stop offset="100%" stop-color="#0a0c0e" stop-opacity="0"/>
                 </radialGradient>
               </defs>
               <rect x="0" y="0" width="200" height="260" fill="url(#pg)"/>
@@ -116,35 +196,39 @@
                 <circle cx="100" cy="110" r="58"/>
                 <circle cx="100" cy="110" r="44"/>
                 <path d="M100 40 L100 180 M40 110 L160 110 M58 68 L142 152 M142 68 L58 152"/>
-                <path d="M100 110 m-70 0 a70 70 0 1 0 140 0 a70 70 0 1 0 -140 0"/>
               </g>
             </svg>
           </div>
-          <p class="portrait-caption">— sealed likeness of the archivist</p>
+          <p class="portrait-caption">— the keeper, by firelight</p>
         </div>
-        <div class="chronicle__body">
-          <p class="reveal drop" data-reveal>Long ago I traded the warm south for the high, hushed places where
-            design breathes slower. I build for the web — but I think like a smith. Every button
-            should feel forged. Every transition should land like snow, not slam like a door.</p>
-          <p class="reveal" data-reveal data-delay="1">My work lives at the meeting of engineering and enchantment:
-            performant front-ends, motion that means something, and interfaces that keep their
-            composure under storm. I care about the cold details most people never notice —
-            until they do.</p>
+        <div class="hall__body">
+          <p class="reveal drop" data-reveal>Outside, everything is stone and snow. In here I keep the work:
+            interfaces forged for the web, built the way a smith builds — slowly, deliberately,
+            to outlast the weather. Every button struck true. Every transition landing like
+            snow, never slamming like a door.</p>
+          <p class="reveal" data-reveal data-delay="1">My craft lives where engineering meets ritual: performant
+            front-ends, motion that means something, and systems that keep their composure
+            under storm. The cold details most people never notice — until they do.</p>
           <ul class="creed reveal" data-reveal data-delay="2">
             <li><em>Restraint</em> — every effect earns its place.</li>
             <li><em>Craft</em> — legible at a glance, deep on inspection.</li>
             <li><em>Wonder</em> — software should still feel like magic.</li>
           </ul>
+          <dl class="hall__stats reveal" data-reveal data-delay="3">
+            <div><dt data-count="8">0</dt><dd>Winters Crafting</dd></div>
+            <div><dt data-count="60" data-suffix="+">0</dt><dd>Works Forged</dd></div>
+            <div><dt data-count="14">0</dt><dd>Realms Served</dd></div>
+          </dl>
         </div>
       </div>
     </section>
 
-    <!-- ARCANE ARTS / SKILLS -->
-    <section class="section arts" id="arts">
+    <!-- II · THE FORGE -->
+    <section class="section forge" id="forge">
       <div class="section__head">
         <span class="section__num">II</span>
-        <h2 class="section__title reveal" data-reveal>Arcane Arts</h2>
-        <p class="section__sub reveal" data-reveal data-delay="1">Disciplines honed in the long dark</p>
+        <h2 class="section__title reveal" data-reveal>The Forge</h2>
+        <p class="section__sub reveal" data-reveal data-delay="1">Disciplines kept hot through the long dark</p>
       </div>
       <div class="runes">
         <article class="rune reveal" data-reveal tabindex="0">
@@ -156,7 +240,7 @@
         <article class="rune reveal" data-reveal data-delay="1" tabindex="0">
           <div class="rune__mark">ᛉ</div>
           <h3>Motion & Ritual</h3>
-          <p>Canvas, WebGL, and physics-driven animation. Snow that falls with weight; transitions that breathe.</p>
+          <p>Canvas, WebGL, and physics-driven animation. Camera moves with weight; transitions that breathe.</p>
           <div class="rune__bar"><i style="--v:90%"></i></div>
         </article>
         <article class="rune reveal" data-reveal data-delay="2" tabindex="0">
@@ -186,25 +270,25 @@
       </div>
     </section>
 
-    <!-- RELICS / PROJECTS -->
-    <section class="section relics" id="relics">
+    <!-- III · THE VAULT -->
+    <section class="section vault" id="vault">
       <div class="section__head">
         <span class="section__num">III</span>
-        <h2 class="section__title reveal" data-reveal>The Relics</h2>
-        <p class="section__sub reveal" data-reveal data-delay="1">Artifacts recovered from finished work</p>
+        <h2 class="section__title reveal" data-reveal>The Vault</h2>
+        <p class="section__sub reveal" data-reveal data-delay="1">Works recovered from the fire</p>
       </div>
       <div class="relic-grid">
         <article class="relic relic--wide reveal" data-reveal>
           <div class="relic__aura"></div>
           <div class="relic__body">
-            <span class="relic__tag">Featured Relic</span>
+            <span class="relic__tag">Featured Work</span>
             <h3>Aurora — a realtime frost engine</h3>
-            <p>A GPU particle system rendering half a million snowflakes with wind fields and
-              depth of field. Ships in this very page. Open-source, obsessively optimized.</p>
+            <p>A particle system rendering snowfall with wind fields and depth layers. The approach
+              you just walked through runs on its descendant. Open-source, obsessively optimized.</p>
             <div class="relic__meta">
               <span>WebGL</span><span>TypeScript</span><span>GLSL</span>
             </div>
-            <a class="relic__link" href="#" aria-label="Open the Aurora relic">Unseal <span>→</span></a>
+            <a class="relic__link" href="#" aria-label="Open the Aurora work">Unseal <span>→</span></a>
           </div>
         </article>
         <article class="relic reveal" data-reveal data-delay="1">
@@ -251,17 +335,17 @@
       </div>
     </section>
 
-    <!-- RAVEN / CONTACT -->
-    <section class="section raven" id="raven">
-      <div class="raven__panel reveal" data-reveal>
+    <!-- IV · THE RAVENRY -->
+    <section class="section ravenry" id="ravenry">
+      <div class="ravenry__panel reveal" data-reveal>
         <div class="section__head section__head--center">
           <span class="section__num">IV</span>
-          <h2 class="section__title">Send a Raven</h2>
-          <p class="section__sub">The archive is never truly closed</p>
+          <h2 class="section__title">The Ravenry</h2>
+          <p class="section__sub">The keep is never truly sealed</p>
         </div>
-        <p class="raven__lede">Have a realm that needs building — or just want to trade stories from the road?
-          Send word. I answer every raven that reaches the tower.</p>
-        <form class="raven__form" id="ravenForm" novalidate>
+        <p class="ravenry__lede">Have a realm that needs building — or just want to trade stories from the road?
+          Send word. Every raven that reaches the tower is answered.</p>
+        <form class="ravenry__form" id="ravenForm" novalidate>
           <div class="field">
             <input type="text" id="name" name="name" required placeholder=" " autocomplete="name" />
             <label for="name">Your name, traveler</label>
@@ -275,9 +359,9 @@
             <label for="message">Your message, carried on wing</label>
           </div>
           <button type="submit" class="btn btn--primary btn--wide"><span>Release the Raven</span></button>
-          <p class="raven__status" id="ravenStatus" role="status" aria-live="polite"></p>
+          <p class="ravenry__status" id="ravenStatus" role="status" aria-live="polite"></p>
         </form>
-        <div class="raven__links">
+        <div class="ravenry__links">
           <a href="mailto:hello@frostfall.archive">✉ hello@frostfall.archive</a>
           <a href="#" aria-label="Codex">⌘ Codex</a>
           <a href="#" aria-label="Scrolls">✎ Scrolls</a>
@@ -285,12 +369,12 @@
         </div>
       </div>
     </section>
-  </main>
 
-  <footer class="footer">
-    <p>Forged in the cold, far from any court. © <span id="year"></span> Frostfall Archive.</p>
-    <p class="footer__whisper">Built by hand — every snowflake accounted for.</p>
-  </footer>
+    <footer class="footer">
+      <p>Forged in the cold, kept by fire. © <span id="year"></span> Frostfall.</p>
+      <p class="footer__whisper">Black, gray, white — and one flame behind the gate.</p>
+    </footer>
+  </main>
 
   <button class="sound-toggle" id="soundToggle" aria-label="Toggle winter wind" aria-pressed="false">
     <span class="sound-toggle__wave"></span>
@@ -299,7 +383,7 @@
     <span class="sound-toggle__label">wind</span>
   </button>
 
-  <script src="js/snow.js"></script>
+  <script src="js/scene.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
