@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="The frozen archive of a wandering craftsman — a dark fantasy portfolio wrapped in snow and old magic." />
+  <meta name="theme-color" content="#05070f" />
+  <title>Frostfall — Archive of the Wanderer</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=EB+Garamond:ital@0;1&display=swap" rel="stylesheet" />
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%E2%9D%84%EF%B8%8F%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- Preloader -->
+  <div class="preloader" id="preloader" aria-hidden="true">
+    <div class="preloader__rune" aria-hidden="true">
+      <svg viewBox="0 0 100 100" width="90" height="90">
+        <circle cx="50" cy="50" r="44" class="pl-ring" />
+        <circle cx="50" cy="50" r="34" class="pl-ring pl-ring--slow" />
+        <path d="M50 12 L50 88 M22 30 L78 70 M78 30 L22 70" class="pl-glyph" />
+      </svg>
+    </div>
+    <p class="preloader__text">Unsealing the archive<span class="dots"><i>.</i><i>.</i><i>.</i></span></p>
+  </div>
+
+  <!-- Atmosphere layers -->
+  <canvas id="aurora" class="fx-layer" aria-hidden="true"></canvas>
+  <div class="mountains" aria-hidden="true">
+    <div class="mountains__far"></div>
+    <div class="mountains__mid"></div>
+    <div class="mountains__near"></div>
+  </div>
+  <div class="fog fog--back" aria-hidden="true"></div>
+  <canvas id="snow" class="fx-layer fx-layer--top" aria-hidden="true"></canvas>
+  <div class="fog fog--front" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="cursor" id="cursor" aria-hidden="true"><span></span></div>
+
+  <!-- Progress rune -->
+  <div class="scroll-progress" aria-hidden="true"><span id="scrollBar"></span></div>
+
+  <!-- Navigation -->
+  <header class="nav" id="nav">
+    <a class="nav__crest" href="#home" aria-label="Return to the gate">
+      <svg viewBox="0 0 48 48" width="34" height="34" aria-hidden="true">
+        <path d="M24 3 L43 13 V27 C43 37 34 43 24 46 C14 43 5 37 5 27 V13 Z" class="crest-shield" />
+        <path d="M24 12 L24 34 M16 20 L32 20 M18 27 L30 27" class="crest-glyph" />
+      </svg>
+      <span>Frostfall</span>
+    </a>
+    <nav class="nav__links" aria-label="Primary">
+      <a href="#chronicle" data-num="I">Chronicle</a>
+      <a href="#arts" data-num="II">Arcane Arts</a>
+      <a href="#relics" data-num="III">Relics</a>
+      <a href="#raven" data-num="IV">Send a Raven</a>
+    </nav>
+    <button class="nav__toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero" id="home">
+      <div class="hero__inner">
+        <p class="hero__eyebrow reveal" data-reveal>❄ The frozen archive of a wandering craftsman ❄</p>
+        <h1 class="hero__title">
+          <span class="line reveal" data-reveal data-delay="1">Where Winter</span>
+          <span class="line reveal glow" data-reveal data-delay="2">Keeps Its Secrets</span>
+        </h1>
+        <p class="hero__lede reveal" data-reveal data-delay="3">
+          I forge interfaces from cold light and old magic — worlds that feel carved
+          from ice yet warm to the touch. Wander in. The snow never stops here.
+        </p>
+        <div class="hero__actions reveal" data-reveal data-delay="4">
+          <a class="btn btn--primary" href="#relics"><span>Enter the Vault</span></a>
+          <a class="btn btn--ghost" href="#raven"><span>Summon Me</span></a>
+        </div>
+        <dl class="hero__stats reveal" data-reveal data-delay="5">
+          <div><dt data-count="8">0</dt><dd>Winters Crafting</dd></div>
+          <div><dt data-count="60" data-suffix="+">0</dt><dd>Relics Forged</dd></div>
+          <div><dt data-count="14">0</dt><dd>Realms Served</dd></div>
+        </dl>
+      </div>
+      <a class="hero__scroll" href="#chronicle" aria-label="Descend">
+        <span class="hero__scroll-line"></span>
+        <span class="hero__scroll-word">descend</span>
+      </a>
+    </section>
+
+    <!-- CHRONICLE / ABOUT -->
+    <section class="section chronicle" id="chronicle">
+      <div class="section__head">
+        <span class="section__num">I</span>
+        <h2 class="section__title reveal" data-reveal>The Chronicle</h2>
+        <p class="section__sub reveal" data-reveal data-delay="1">Who wanders here</p>
+      </div>
+      <div class="chronicle__grid">
+        <div class="chronicle__portrait reveal" data-reveal>
+          <div class="portrait-frame">
+            <div class="portrait-frame__glow"></div>
+            <svg viewBox="0 0 200 260" class="portrait-sigil" aria-hidden="true">
+              <defs>
+                <radialGradient id="pg" cx="50%" cy="35%" r="70%">
+                  <stop offset="0%" stop-color="#bfe9ff" stop-opacity="0.9"/>
+                  <stop offset="55%" stop-color="#4b74a8" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="#0a1120" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <rect x="0" y="0" width="200" height="260" fill="url(#pg)"/>
+              <g class="portrait-sigil__lines">
+                <circle cx="100" cy="110" r="58"/>
+                <circle cx="100" cy="110" r="44"/>
+                <path d="M100 40 L100 180 M40 110 L160 110 M58 68 L142 152 M142 68 L58 152"/>
+                <path d="M100 110 m-70 0 a70 70 0 1 0 140 0 a70 70 0 1 0 -140 0"/>
+              </g>
+            </svg>
+          </div>
+          <p class="portrait-caption">— sealed likeness of the archivist</p>
+        </div>
+        <div class="chronicle__body">
+          <p class="reveal drop" data-reveal>Long ago I traded the warm south for the high, hushed places where
+            design breathes slower. I build for the web — but I think like a smith. Every button
+            should feel forged. Every transition should land like snow, not slam like a door.</p>
+          <p class="reveal" data-reveal data-delay="1">My work lives at the meeting of engineering and enchantment:
+            performant front-ends, motion that means something, and interfaces that keep their
+            composure under storm. I care about the cold details most people never notice —
+            until they do.</p>
+          <ul class="creed reveal" data-reveal data-delay="2">
+            <li><em>Restraint</em> — every effect earns its place.</li>
+            <li><em>Craft</em> — legible at a glance, deep on inspection.</li>
+            <li><em>Wonder</em> — software should still feel like magic.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ARCANE ARTS / SKILLS -->
+    <section class="section arts" id="arts">
+      <div class="section__head">
+        <span class="section__num">II</span>
+        <h2 class="section__title reveal" data-reveal>Arcane Arts</h2>
+        <p class="section__sub reveal" data-reveal data-delay="1">Disciplines honed in the long dark</p>
+      </div>
+      <div class="runes">
+        <article class="rune reveal" data-reveal tabindex="0">
+          <div class="rune__mark">ᚠ</div>
+          <h3>Frontcraft</h3>
+          <p>TypeScript, React, and hand-tuned CSS. Interfaces that stay smooth at 120fps and calm under load.</p>
+          <div class="rune__bar"><i style="--v:95%"></i></div>
+        </article>
+        <article class="rune reveal" data-reveal data-delay="1" tabindex="0">
+          <div class="rune__mark">ᛉ</div>
+          <h3>Motion & Ritual</h3>
+          <p>Canvas, WebGL, and physics-driven animation. Snow that falls with weight; transitions that breathe.</p>
+          <div class="rune__bar"><i style="--v:90%"></i></div>
+        </article>
+        <article class="rune reveal" data-reveal data-delay="2" tabindex="0">
+          <div class="rune__mark">ᛜ</div>
+          <h3>Systems & Sigils</h3>
+          <p>Design systems, tokens, and component libraries that scale across realms without losing their soul.</p>
+          <div class="rune__bar"><i style="--v:88%"></i></div>
+        </article>
+        <article class="rune reveal" data-reveal data-delay="3" tabindex="0">
+          <div class="rune__mark">ᚨ</div>
+          <h3>Architecture</h3>
+          <p>Node, edge functions, and pragmatic infrastructure. Foundations that hold when the storm comes.</p>
+          <div class="rune__bar"><i style="--v:82%"></i></div>
+        </article>
+        <article class="rune reveal" data-reveal data-delay="4" tabindex="0">
+          <div class="rune__mark">ᛟ</div>
+          <h3>Type & Tone</h3>
+          <p>Typography, brand voice, and the quiet grammar of good UI. Words and whitespace as craft.</p>
+          <div class="rune__bar"><i style="--v:86%"></i></div>
+        </article>
+        <article class="rune reveal" data-reveal data-delay="5" tabindex="0">
+          <div class="rune__mark">ᚱ</div>
+          <h3>Performance</h3>
+          <p>Profiling, budgets, and the dark art of making heavy things feel weightless.</p>
+          <div class="rune__bar"><i style="--v:92%"></i></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- RELICS / PROJECTS -->
+    <section class="section relics" id="relics">
+      <div class="section__head">
+        <span class="section__num">III</span>
+        <h2 class="section__title reveal" data-reveal>The Relics</h2>
+        <p class="section__sub reveal" data-reveal data-delay="1">Artifacts recovered from finished work</p>
+      </div>
+      <div class="relic-grid">
+        <article class="relic relic--wide reveal" data-reveal>
+          <div class="relic__aura"></div>
+          <div class="relic__body">
+            <span class="relic__tag">Featured Relic</span>
+            <h3>Aurora — a realtime frost engine</h3>
+            <p>A GPU particle system rendering half a million snowflakes with wind fields and
+              depth of field. Ships in this very page. Open-source, obsessively optimized.</p>
+            <div class="relic__meta">
+              <span>WebGL</span><span>TypeScript</span><span>GLSL</span>
+            </div>
+            <a class="relic__link" href="#" aria-label="Open the Aurora relic">Unseal <span>→</span></a>
+          </div>
+        </article>
+        <article class="relic reveal" data-reveal data-delay="1">
+          <div class="relic__aura"></div>
+          <div class="relic__body">
+            <span class="relic__tag">Interface</span>
+            <h3>The Cold Ledger</h3>
+            <p>A banking dashboard for a northern guild. Dense data made legible with warmth and hierarchy.</p>
+            <div class="relic__meta"><span>React</span><span>D3</span></div>
+            <a class="relic__link" href="#">Unseal <span>→</span></a>
+          </div>
+        </article>
+        <article class="relic reveal" data-reveal data-delay="2">
+          <div class="relic__aura"></div>
+          <div class="relic__body">
+            <span class="relic__tag">Design System</span>
+            <h3>Rimeforge</h3>
+            <p>A component library and token engine adopted across four product realms.</p>
+            <div class="relic__meta"><span>Storybook</span><span>Tokens</span></div>
+            <a class="relic__link" href="#">Unseal <span>→</span></a>
+          </div>
+        </article>
+        <article class="relic reveal" data-reveal data-delay="3">
+          <div class="relic__aura"></div>
+          <div class="relic__body">
+            <span class="relic__tag">Experiment</span>
+            <h3>Whisperwind</h3>
+            <p>A generative sound-and-visual toy that turns weather data into ambient winterscapes.</p>
+            <div class="relic__meta"><span>Web Audio</span><span>Canvas</span></div>
+            <a class="relic__link" href="#">Unseal <span>→</span></a>
+          </div>
+        </article>
+        <article class="relic relic--wide reveal" data-reveal data-delay="1">
+          <div class="relic__aura"></div>
+          <div class="relic__body">
+            <span class="relic__tag">Platform</span>
+            <h3>The Long Hall — a guild's home</h3>
+            <p>An end-to-end marketing and commerce platform. Sub-second loads, editorial motion,
+              and an admin forge the client actually enjoys using.</p>
+            <div class="relic__meta"><span>Next.js</span><span>Edge</span><span>CMS</span></div>
+            <a class="relic__link" href="#">Unseal <span>→</span></a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- RAVEN / CONTACT -->
+    <section class="section raven" id="raven">
+      <div class="raven__panel reveal" data-reveal>
+        <div class="section__head section__head--center">
+          <span class="section__num">IV</span>
+          <h2 class="section__title">Send a Raven</h2>
+          <p class="section__sub">The archive is never truly closed</p>
+        </div>
+        <p class="raven__lede">Have a realm that needs building — or just want to trade stories from the road?
+          Send word. I answer every raven that reaches the tower.</p>
+        <form class="raven__form" id="ravenForm" novalidate>
+          <div class="field">
+            <input type="text" id="name" name="name" required placeholder=" " autocomplete="name" />
+            <label for="name">Your name, traveler</label>
+          </div>
+          <div class="field">
+            <input type="email" id="email" name="email" required placeholder=" " autocomplete="email" />
+            <label for="email">Where to send the reply</label>
+          </div>
+          <div class="field field--full">
+            <textarea id="message" name="message" rows="4" required placeholder=" "></textarea>
+            <label for="message">Your message, carried on wing</label>
+          </div>
+          <button type="submit" class="btn btn--primary btn--wide"><span>Release the Raven</span></button>
+          <p class="raven__status" id="ravenStatus" role="status" aria-live="polite"></p>
+        </form>
+        <div class="raven__links">
+          <a href="mailto:hello@frostfall.archive">✉ hello@frostfall.archive</a>
+          <a href="#" aria-label="Codex">⌘ Codex</a>
+          <a href="#" aria-label="Scrolls">✎ Scrolls</a>
+          <a href="#" aria-label="Northern Star">✦ Northern Star</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Forged in the cold, far from any court. © <span id="year"></span> Frostfall Archive.</p>
+    <p class="footer__whisper">Built by hand — every snowflake accounted for.</p>
+  </footer>
+
+  <button class="sound-toggle" id="soundToggle" aria-label="Toggle winter wind" aria-pressed="false">
+    <span class="sound-toggle__wave"></span>
+    <span class="sound-toggle__wave"></span>
+    <span class="sound-toggle__wave"></span>
+    <span class="sound-toggle__label">wind</span>
+  </button>
+
+  <script src="js/snow.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
